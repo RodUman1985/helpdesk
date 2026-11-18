@@ -5,33 +5,17 @@ spring:
     active: dev
   jpa:
     open-in-view: false
-    properties:
-      hibernate:
-        format_sql: true
-  mail:
-    host: smtp.gmail.com
-    port: 587
-    username: ${MAIL_USERNAME:}
-    password: ${MAIL_PASSWORD:}
-    properties:
-      mail:
-        smtp:
-          auth: true
-          starttls:
-            enable: true
-
-server:
-  port: 8080
+    hibernate:
+      ddl-auto: validate
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
 
 management:
   endpoints:
     web:
       exposure:
-        include: health, info, metrics
-
-springdoc:
-  swagger-ui:
-    path: /swagger-ui.html
+        include: health,info
 
 ---
 spring:
@@ -39,19 +23,19 @@ spring:
     activate:
       on-profile: dev
   datasource:
-    url: jdbc:h2:mem:helpdesk;MODE=PostgreSQL;DB_CLOSE_DELAY=-1
+    url: jdbc:h2:mem:helpdesk;DB_CLOSE_DELAY=-1;MODE=PostgreSQL
     driver-class-name: org.h2.Driver
     username: sa
-    password:
-  jpa:
-    hibernate:
-      ddl-auto: create-drop
-  flyway:
-    enabled: false
+    password: ""
   h2:
     console:
       enabled: true
       path: /h2-console
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
 
 ---
 spring:
@@ -59,13 +43,9 @@ spring:
     activate:
       on-profile: docker
   datasource:
-    url: jdbc:postgresql://localhost:5432/helpdesk
-    username: helpdesk_user
-    password: helpdesk_pass
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:helpdesk}
+    username: ${DB_USER:helpdesk_user}
+    password: ${DB_PASSWORD:helpdesk_pass}
     driver-class-name: org.postgresql.Driver
   jpa:
-    hibernate:
-      ddl-auto: validate
-  flyway:
-    enabled: true
-    locations: classpath:db/migration
+    show-sql: true
